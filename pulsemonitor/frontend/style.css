@@ -1,0 +1,314 @@
+/* High-End Dark Medical Monitor Stylesheet */
+
+:root {
+    --bg-dark: #090d16;
+    --bg-surface: #111827;
+    --bg-glass: rgba(17, 24, 39, 0.75);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    
+    /* Medical Accent Colors */
+    --cyan: #00f2fe;
+    --cyan-subtle: rgba(0, 242, 254, 0.15);
+    --emerald: #10b981;
+    --emerald-light: #6ee7b7;
+    --emerald-subtle: rgba(16, 185, 129, 0.15);
+    --sky: #38bdf8;
+    --sky-subtle: rgba(56, 189, 248, 0.15);
+    --amber: #f59e0b;
+    --amber-subtle: rgba(245, 158, 11, 0.15);
+    --crimson: #ef4444;
+    --crimson-subtle: rgba(239, 68, 68, 0.15);
+    --violet: #c084fc;
+    --violet-subtle: rgba(192, 132, 252, 0.15);
+}
+
+body.medical-body {
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
+    color: #f3f4f6;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+}
+
+/* Typography Utility */
+.font-heading {
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: 0.05em;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
+
+/* Color Utilities */
+.text-cyan { color: var(--cyan) !important; }
+.text-emerald { color: var(--emerald) !important; }
+.text-emerald-light { color: var(--emerald-light) !important; }
+.text-sky { color: var(--sky) !important; }
+.text-amber { color: var(--amber) !important; }
+.text-crimson { color: var(--crimson) !important; }
+.text-violet { color: var(--violet) !important; }
+
+.bg-cyan { background-color: var(--cyan) !important; color: #000 !important; }
+.bg-cyan-subtle { background-color: var(--cyan-subtle) !important; }
+.bg-emerald { background-color: var(--emerald) !important; }
+
+.border-cyan { border-color: var(--cyan) !important; }
+.border-cyan-glow {
+    border: 1px solid rgba(0, 242, 254, 0.25) !important;
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.08);
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-modal {
+    background: #0f172a;
+    border: 1px solid var(--cyan);
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+}
+
+/* Navigation & Badges */
+.nav-medical {
+    background: rgba(17, 24, 39, 0.9);
+    backdrop-filter: blur(12px);
+}
+
+.brand-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--cyan-subtle);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pulse-icon {
+    font-size: 1.4rem;
+    animation: pulseHeart 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseHeart {
+    0% { transform: scale(1); filter: drop-shadow(0 0 2px var(--cyan)); }
+    15% { transform: scale(1.25); filter: drop-shadow(0 0 8px var(--cyan)); }
+    30% { transform: scale(1); filter: drop-shadow(0 0 2px var(--cyan)); }
+    45% { transform: scale(1.15); filter: drop-shadow(0 0 6px var(--cyan)); }
+    60% { transform: scale(1); }
+}
+
+.mode-badge {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.mode-badge.mode-simulated {
+    border-color: rgba(245, 158, 11, 0.4);
+    color: var(--amber);
+}
+
+.mode-badge.mode-hardware {
+    border-color: rgba(16, 185, 129, 0.4);
+    color: var(--emerald);
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+    box-shadow: 0 0 8px currentColor;
+    animation: blink 1.2s infinite alternate;
+}
+
+@keyframes blink {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+}
+
+/* Buttons */
+.btn-cyan {
+    background: var(--cyan);
+    color: #090d16;
+    border: none;
+}
+.btn-cyan:hover {
+    background: #4facfe;
+    color: #090d16;
+}
+
+.btn-profile {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #9ca3af;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 8px;
+    padding: 6px 12px;
+    transition: all 0.2s ease;
+}
+
+.btn-profile:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.btn-profile.active {
+    background: var(--cyan-subtle);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    font-weight: 600;
+}
+
+.btn-outline-emerald {
+    color: var(--emerald);
+    border-color: var(--emerald);
+}
+.btn-outline-emerald:hover {
+    background: var(--emerald);
+    color: #000;
+}
+
+.btn-outline-crimson {
+    color: var(--crimson);
+    border-color: var(--crimson);
+}
+.btn-outline-crimson:hover {
+    background: var(--crimson);
+    color: #fff;
+}
+
+/* BPM Meter Display */
+.card-bpm-glow {
+    background: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.08) 0%, rgba(17, 24, 39, 0.8) 70%);
+}
+
+.bpm-number {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.bpm-unit {
+    font-size: 1.2rem;
+}
+
+/* Heart Rate Zone Bar */
+.hr-zone-wrapper {
+    position: relative;
+}
+
+.hr-zone-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #38bdf8 0%, #10b981 35%, #f59e0b 70%, #ef4444 100%);
+    position: relative;
+    overflow: visible;
+}
+
+.hr-zone-pointer {
+    position: absolute;
+    top: -4px;
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border: 3px solid #090d16;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px #ffffff;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Canvas Oscilloscope Box */
+.canvas-container {
+    background: #030712;
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+.canvas-overlay-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-size: 30px 30px;
+    background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.live-indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--emerald);
+    box-shadow: 0 0 10px var(--emerald);
+    animation: blink 1s infinite alternate;
+}
+
+/* Alert Styling Overrides */
+.alert-emerald {
+    background: var(--emerald-subtle) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+.alert-sky {
+    background: var(--sky-subtle) !important;
+    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+}
+
+.alert-amber {
+    background: var(--amber-subtle) !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+.alert-crimson {
+    background: var(--crimson-subtle) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.alert-violet {
+    background: var(--violet-subtle) !important;
+    border: 1px solid rgba(192, 132, 252, 0.3) !important;
+}
+
+/* Featured Dedicated Emoji & State Dialogue Card (Exact Mockup Match) */
+.card-emoji-dialogue-mockup {
+    background: radial-gradient(circle at 50% 20%, rgba(0, 242, 254, 0.12) 0%, rgba(15, 23, 42, 0.95) 80%);
+    border: 2px solid rgba(0, 242, 254, 0.4);
+    box-shadow: 0 0 35px rgba(0, 242, 254, 0.2), inset 0 0 25px rgba(0, 242, 254, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.emoji-hero-display {
+    font-size: 5.5rem;
+    line-height: 1;
+    letter-spacing: 0.2em;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.7));
+    animation: pulseHeroEmoji 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseHeroEmoji {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6)); }
+    50% { transform: scale(1.08); filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.8)); }
+}
+
+.speech-dialogue-mockup {
+    background: rgba(10, 15, 29, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+}

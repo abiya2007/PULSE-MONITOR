@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Pulse Rate Monitor & Health Analyzer</title>
+    <!-- Bootstrap 5.3 Dark Mode -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="medical-body">
+
+    <!-- Top Navigation Header -->
+    <header class="navbar navbar-expand-lg sticky-top nav-medical border-bottom border-dark-subtle px-4 py-2">
+        <div class="container-fluid p-0">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-3" href="#">
+                <div class="brand-icon-wrapper">
+                    <i class="bi bi-heart-pulse-fill pulse-icon text-cyan"></i>
+                </div>
+                <div>
+                    <span class="fs-5 tracking-wide text-white font-heading">PULSEMONITOR</span>
+                    <span class="badge bg-cyan-subtle text-cyan font-mono ms-2 px-2 py-1 fs-8">CLINICAL V1.0</span>
+                </div>
+            </a>
+            
+            <div class="d-flex align-items-center gap-3">
+                <!-- Hardware / Simulator Mode Badge -->
+                <div id="connectionBadge" class="mode-badge mode-simulated d-flex align-items-center gap-2 px-3 py-1-5 rounded-pill">
+                    <span class="pulse-dot"></span>
+                    <span class="font-mono text-uppercase fs-7 fw-semibold">MODE: SIMULATED</span>
+                </div>
+                
+                <!-- Serial Port Selector -->
+                <div class="input-group input-group-sm port-input-group">
+                    <span class="input-group-text bg-dark-subtle border-secondary-subtle text-secondary">
+                        <i class="bi bi-usb-c"></i>
+                    </span>
+                    <select id="portSelect" class="form-select form-select-sm bg-dark text-light border-secondary-subtle font-mono">
+                        <option value="">Scan USB COM Ports...</option>
+                    </select>
+                    <button id="btnConnect" class="btn btn-cyan btn-sm fw-semibold">Connect</button>
+                    <button id="btnRefreshPorts" class="btn btn-outline-secondary btn-sm" title="Refresh Ports">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="container-fluid px-4 py-4">
+
+        <!-- Simulation & Recording Controls Bar -->
+        <div class="glass-card mb-4 p-3 rounded-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                
+                <!-- Profile Preset Buttons -->
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="text-secondary font-mono text-uppercase fs-8 fw-bold me-1">
+                        <i class="bi bi-sliders me-1"></i> SIMULATION PROFILES:
+                    </span>
+                    <button class="btn btn-profile sim-mode-btn" data-mode="SLEEPING">
+                        😴 Sleeping (&lt;50)
+                    </button>
+                    <button class="btn btn-profile sim-mode-btn" data-mode="RESTING">
+                        🧘 Relaxed (50-65)
+                    </button>
+                    <button class="btn btn-profile sim-mode-btn active" data-mode="NORMAL">
+                        😊 Normal (66-85)
+                    </button>
+                    <button class="btn btn-profile sim-mode-btn" data-mode="LIGHT_ACTIVITY">
+                        🤩 Excited (86-110)
+                    </button>
+                    <button class="btn btn-profile sim-mode-btn" data-mode="FAT_BURN">
+                        🏃 Fat Burn (111-130)
+                    </button>
+                    <button class="btn btn-profile sim-mode-btn" data-mode="CARDIO">
+                        🏋️ Cardio (131-160)
+                    </button>
+                    <button class="btn btn-profile sim-mode-btn" data-mode="EXTREME">
+                        🥵 Extreme (&gt;160)
+                    </button>
+                    <button class="btn btn-profile sim-mode-btn" data-mode="ARRHYTHMIA">
+                        ⚡ Arrhythmia
+                    </button>
+                </div>
+
+                <!-- Session Logger Bar -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="font-mono fs-7 text-secondary">
+                        RECORDING SESSION: <span id="lblSessionId" class="text-cyan fw-bold">#1</span>
+                    </div>
+                    <button id="btnStartSession" class="btn btn-outline-emerald btn-sm rounded-pill px-3">
+                        <i class="bi bi-record-circle-fill me-1"></i> New Session
+                    </button>
+                    <button id="btnEndSession" class="btn btn-outline-crimson btn-sm rounded-pill px-3">
+                        <i class="bi bi-stop-circle-fill me-1"></i> Stop & Save
+                    </button>
+                </div>
+            </div>
+        <!-- Telemetry & Diagnostic Main Grid -->
+        <div class="row g-4">
+
+            <!-- Left Column: Key Metrics & PPG Oscilloscope -->
+            <div class="col-xl-7 col-lg-6">
+                
+                <!-- Main Metrics Cards Grid -->
+                <div class="row g-3 mb-4">
+                    
+                    <!-- Giant BPM Meter Card -->
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 rounded-4 text-center h-100 position-relative overflow-hidden card-bpm-glow">
+                            <div class="d-flex justify-content-between align-items-center text-secondary mb-2">
+                                <span class="font-mono text-uppercase fs-8 fw-bold">PULSE RATE (BPM)</span>
+                                <i class="bi bi-heartbeat fs-5 text-crimson animate-pulse"></i>
+                            </div>
+                            
+                            <div class="bpm-display my-2 d-flex justify-content-center align-items-center gap-2">
+                                <span id="valBPM" class="bpm-number font-heading text-white">--</span>
+                                <span class="bpm-unit font-mono text-secondary">BPM</span>
+                                <span id="valEmoji" class="fs-1 ms-1">😊</span>
+                            </div>
+
+                            <!-- Heart Rate Zone Indicator Bar -->
+                            <div class="hr-zone-wrapper mt-3 mb-2">
+                                <div class="hr-zone-bar">
+                                    <div id="hrZoneIndicator" class="hr-zone-pointer" style="left: 45%;"></div>
+                                </div>
+                                <div class="d-flex justify-content-between font-mono fs-8 text-secondary mt-1">
+                                    <span>&lt;50</span>
+                                    <span>50-65</span>
+                                    <span>66-85</span>
+                                    <span>86-110</span>
+                                    <span>111-130</span>
+                                    <span>131-160</span>
+                                    <span>&gt;160</span>
+                                </div>
+                            </div>
+
+                            <!-- Category Badge -->
+                            <div id="badgeCategory" class="badge bg-emerald text-dark font-mono px-3 py-2 rounded-pill fs-7 fw-bold mt-2">
+                                NORMAL RESTING 😊 💙
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Metrics (IBI & HRV) -->
+                    <div class="col-md-6">
+                        <div class="row g-3 h-100">
+                            <!-- IBI Card -->
+                            <div class="col-12">
+                                <div class="glass-card p-3 rounded-4 h-100 d-flex flex-column justify-content-between">
+                                    <div class="d-flex justify-content-between align-items-center text-secondary">
+                                        <span class="font-mono text-uppercase fs-8 fw-bold">INTER-BEAT INTERVAL (IBI)</span>
+                                        <i class="bi bi-clock-history text-cyan"></i>
+                                    </div>
+                                    <div class="d-flex align-items-baseline gap-2 my-2">
+                                        <span id="valIBI" class="fs-1 fw-bold font-heading text-cyan">--</span>
+                                        <span class="font-mono text-secondary fs-7">ms</span>
+                                    </div>
+                                    <span class="fs-8 text-secondary font-mono">Time between consecutive pulse peaks</span>
+                                </div>
+                            </div>
+                            <!-- HRV Card -->
+                            <div class="col-12">
+                                <div class="glass-card p-3 rounded-4 h-100 d-flex flex-column justify-content-between">
+                                    <div class="d-flex justify-content-between align-items-center text-secondary">
+                                        <span class="font-mono text-uppercase fs-8 fw-bold">BEAT VARIATION (HRV / SDNN)</span>
+                                        <i class="bi bi-graph-up-arrow text-violet"></i>
+                                    </div>
+                                    <div class="d-flex align-items-baseline gap-2 my-2">
+                                        <span id="valHRV" class="fs-1 fw-bold font-heading text-violet">--</span>
+                                        <span class="font-mono text-secondary fs-7">ms</span>
+                                    </div>
+                                    <span class="fs-8 text-secondary font-mono">Standard deviation of beat intervals</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Optical PPG Waveform Stream -->
+                <div class="glass-card p-4 rounded-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="live-indicator-dot"></span>
+                            <h6 class="font-heading text-uppercase text-white m-0 tracking-wide fs-6">
+                                LIVE OPTICAL PPG WAVEFORM STREAM
+                            </h6>
+                        </div>
+                        <div class="font-mono fs-8 text-secondary bg-dark-subtle px-2 py-1 rounded border border-dark-subtle">
+                            SAMPLING: 10Hz | AMP: REAL-TIME ADC
+                        </div>
+                    </div>
+                    
+                    <!-- Canvas Box -->
+                    <div class="canvas-container rounded-3 position-relative overflow-hidden">
+                        <canvas id="ppgCanvas" height="220" class="w-100 d-block"></canvas>
+                        <div class="canvas-overlay-grid"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Medical & Symptom Analysis Panel -->
+            <div class="col-xl-5 col-lg-6">
+
+                <!-- FEATURED EMOJI & STATE DIALOGUE MOCKUP HERO CARD -->
+                <div id="cardEmojiDialogue" class="glass-card card-emoji-dialogue-mockup p-4 rounded-4 mb-4 text-center position-relative overflow-hidden">
+                    
+                    <!-- Top Large Centered Emojis Display -->
+                    <div class="d-flex justify-content-center align-items-center gap-3 my-2">
+                        <span id="lblEmojiAvatar" class="emoji-hero-display">🧘 😌</span>
+                    </div>
+
+                    <!-- Centered State Title -->
+                    <h3 id="lblEmojiStateTitle" class="font-heading text-white fw-bold text-uppercase tracking-wider my-3 fs-3">
+                        RESTING / RELAXED
+                    </h3>
+
+                    <!-- Dialogue Speech Block -->
+                    <div class="speech-dialogue-mockup text-start p-3.5 rounded-4 mt-3">
+                        <div class="d-flex align-items-start gap-2">
+                            <span class="fs-1 text-cyan font-heading lh-1">“</span>
+                            <p id="lblEmojiDialogue" class="mb-0 fs-5 text-white fw-medium lh-base fst-italic">
+                                Feeling super calm, composed, and peaceful. Mind is steady and breathing is smooth.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="glass-card p-4 rounded-4 h-100 d-flex flex-column justify-content-between border-cyan-glow">
+                    <div>
+                        <!-- Header -->
+                        <div class="d-flex align-items-center gap-2 pb-3 mb-3 border-bottom border-secondary-subtle">
+                            <i class="bi bi-file-earmark-medical-fill fs-4 text-cyan"></i>
+                            <div>
+                                <h6 class="font-heading text-white text-uppercase m-0 fs-6">CLINICAL SYMPTOM & DISEASE DIAGNOSTICS</h6>
+                                <span class="font-mono fs-8 text-secondary">AUTOMATED REFERENCE ENGINE</span>
+                            </div>
+                        </div>
+
+                        <!-- Status Alert Banner -->
+                        <div id="alertSummary" class="alert alert-emerald border-0 rounded-3 p-3 mb-4 d-flex align-items-start gap-3">
+                            <i id="iconStatus" class="bi bi-check-circle-fill fs-3 text-emerald"></i>
+                            <div>
+                                <h6 id="lblStatusTitle" class="fw-bold mb-1 text-white">Normal Resting Heart Rate</h6>
+                                <p id="lblStatusDesc" class="mb-0 fs-7 text-emerald-light">Your pulse rate is within standard healthy adult target ranges (60-100 BPM).</p>
+                            </div>
+                        </div>
+
+                        <!-- Associated Symptoms Panel -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-exclamation-circle text-amber"></i>
+                                <span class="font-mono text-uppercase fs-8 text-secondary fw-bold">ASSOCIATED POTENTIAL SYMPTOMS</span>
+                            </div>
+                            <div id="containerSymptoms" class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-dark-subtle text-secondary border border-secondary-subtle px-3 py-2 font-mono fs-8">
+                                    No abnormal symptoms expected
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Related Clinical Conditions -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-hospital text-crimson"></i>
+                                <span class="font-mono text-uppercase fs-8 text-secondary fw-bold">RELATED MEDICAL CONDITIONS & PHYSIOLOGY</span>
+                            </div>
+                            <div id="containerDiseases" class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-dark-subtle text-secondary border border-secondary-subtle px-3 py-2 font-mono fs-8">
+                                    Healthy cardiovascular resting state
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Actionable Insights Callout -->
+                        <div class="p-3 bg-dark-subtle rounded-3 border border-secondary-subtle">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-info-circle-fill text-cyan fs-7"></i>
+                                <span class="font-mono text-uppercase fs-8 text-cyan fw-bold">CLINICAL INSIGHTS & ADVICE</span>
+                            </div>
+                            <p id="lblAdvice" class="fs-7 text-light-subtle mb-0 lh-sm">
+                                Your heart rate is within the standard healthy adult resting range.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Medical Disclaimer Footer -->
+                    <div class="pt-3 mt-3 border-top border-secondary-subtle text-center">
+                        <p class="font-mono fs-8 text-secondary mb-0">
+                            <i class="bi bi-shield-check me-1 text-cyan"></i>
+                            Microchip Pinned Output Stream | For Educational & Experimental Use Only
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Row: Session Timeline History ("From Where to When, When and How") -->
+        <div class="row g-4 mt-2">
+            <div class="col-12">
+                <div class="glass-card p-4 rounded-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history text-cyan fs-5"></i>
+                            <h6 class="font-heading text-uppercase text-white m-0 tracking-wide">
+                                SESSION TIMELINE HISTORY ("FROM WHERE TO WHEN, WHEN AND HOW")
+                            </h6>
+                        </div>
+                        <button id="btnRefreshHistory" class="btn btn-outline-secondary btn-sm font-mono fs-8">
+                            <i class="bi bi-arrow-clockwise me-1"></i> REFRESH LOGS
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle border-secondary-subtle font-mono fs-7 mb-0">
+                            <thead>
+                                <tr class="text-secondary border-bottom border-secondary-subtle">
+                                    <th>SESSION</th>
+                                    <th>NAME</th>
+                                    <th>START TIME</th>
+                                    <th>END TIME</th>
+                                    <th>READINGS</th>
+                                    <th>MIN BPM</th>
+                                    <th>MAX BPM</th>
+                                    <th>AVG BPM</th>
+                                    <th class="text-end">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableSessionsBody">
+                                <tr>
+                                    <td colspan="9" class="text-center text-secondary py-4">Loading recorded pulse sessions...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Timeline Event Detail Modal -->
+    <div class="modal fade" id="timelineModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content glass-modal border-cyan">
+                <div class="modal-header border-secondary-subtle">
+                    <h5 class="modal-title font-heading text-cyan" id="modalTitle">Session Timeline Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalSummaryHeader" class="row text-center mb-4 g-2"></div>
+                    <h6 class="font-mono text-uppercase text-secondary fs-8 fw-bold mb-3">
+                        <i class="bi bi-list-task me-1"></i> Flagged Pulse Events Timeline ("When & How")
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-sm table-bordered border-secondary-subtle font-mono fs-8">
+                            <thead class="table-secondary text-dark">
+                                <tr>
+                                    <th>TIMESTAMP</th>
+                                    <th>HEART RATE</th>
+                                    <th>CLASSIFICATION</th>
+                                    <th>EVENT DIAGNOSTIC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalEventsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
